@@ -7,14 +7,23 @@
             [om-bootstrap.random :as r]))
 
 
-(defn render-nav [app owner]
+(defn render-nav-item [nav-item _]
+  (reify
+    om/IRender
+    (render [_]
+      (n/nav-item {:href (:href nav-item)} (:label nav-item)))))
+
+
+(defn render-nav [nav _]
+  (.log js/console nav)
   (reify
     om/IRender
     (render [_]
       (n/navbar {:brand (dom/a {:href "#/"} "Admin")
                  :inverse? true}
                 (n/nav {:collapsible? true}
-                 (n/nav-item {:href "#/companies"} "Companies"))))))
+                  (om/build-all render-nav-item (:links nav)))))))
+
 
 (defn render-footer [_ _]
   (reify

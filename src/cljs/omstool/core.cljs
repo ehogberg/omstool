@@ -3,12 +3,14 @@
             [omstool.ui :refer [render-nav render-footer render-homepage]]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
-(defonce app-state (atom {:text "Hello Chestnut!"}))
+(defonce app-state (atom {:nav {:links [{:href "#/companies"
+                                         :label "Companies"}]}}))
 
 (defn main []
+  (.log js/console app-state)
   (om/root
     render-nav
-    nil
+    (get @app-state :nav)
     {:target (. js/document (getElementById "header"))})
 
   (om/root
