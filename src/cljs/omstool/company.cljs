@@ -15,19 +15,22 @@
                      :name "Bar Company"
                      :industry "Travel"}])
 
+(defn input-value [owner input]
+  (-> (om/get-node owner input)
+      .->value))
 
 (defn action-links [owner editing?]
   (if-not editing?
-    (dom/a {:href "#"
-            :onClick (fn [e]
-                       (om/set-state! owner :editing? true)
-                       (.preventDefault e))} "edit")
+    (b/button {:href "#"
+               :onClick (fn [e]
+                          (om/set-state! owner :editing? true)
+                          (.preventDefault e))} "edit")
     (b/toolbar nil
      (b/button {:href "#" :bs-style "primary"} "save")
      (b/button {:href "#"
                 :onClick (fn [e]
-                        (om/set-state! owner :editing? false)
-                        (.preventDefault e))} "cancel"))))
+                           (om/set-state! owner :editing? false)
+                           (.preventDefault e))} "cancel"))))
 
 
 (defcomponent company-table-line [company owner]
@@ -38,11 +41,13 @@
                  (dom/td
                   (if editing?
                     (i/input {:type "text"
+                              :ref "company-name"
                               :default-value (:name company)})
                     (:name company)))
                  (dom/td
                   (if editing?
                     (i/input {:type "text"
+                              :ref "company-id"
                               :default-value (:sid company)})
                     (:sid  company)))
                  (dom/td (:industry company))
