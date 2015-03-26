@@ -3,23 +3,50 @@
             [om-tools.dom :as dom :include-macros true]
             [om-tools.core :refer-macros [defcomponent]]
             [om-bootstrap.table :as t]
+            [om-bootstrap.button :as b]
+            [om-bootstrap.input :as i]
             [om-bootstrap.random :as r]))
 
 
 (def company-data [ {:sid "Foo"
-                     :name "Foo Company"}
+                     :name "Foo Company"
+                     :industry "Retail"}
                     {:sid "Bar"
-                     :name "Bar Company"}])
+                     :name "Bar Company"
+                     :industry "Travel"}])
 
 
-(defcomponent company-info [company _]
+(defn action-links [owner editing?]
+  (if-not editing?
+    (dom/a {:href "#"
+            :onClick (fn [e]
+                       (om/set-state! owner :editing? true)
+                       (.preventDefault e))} "edit")
+    (b/toolbar nil
+     (b/button {:href "#" :bs-style "primary"} "save")
+     (b/button {:href "#"
+                :onClick (fn [e]
+                        (om/set-state! owner :editing? false)
+                        (.preventDefault e))} "cancel"))))
+
+
+(defcomponent company-table-line [company owner]
   (init-state [_]
               {:company company})
-  (render-state [_ {:keys [company]}]
+  (render-state [_ {:keys [company editing?]}]
                 (dom/tr
-                 (dom/td (:name company))
-                 (dom/td (:sid  company))
-                 (dom/td (dom/a {:href ""} "edit")))))
+                 (dom/td
+                  (if editing?
+                    (i/input {:type "text"
+                              :default-value (:name company)})
+                    (:name company)))
+                 (dom/td
+                  (if editing?
+                    (i/input {:type "text"
+                              :default-value (:sid company)})
+                    (:sid  company)))
+                 (dom/td (:industry company))
+                 (dom/td (action-links owner editing?)))))
 
 
 (defcomponent companies-table [_ _]
@@ -27,11 +54,13 @@
                 (t/table {:striped? true}
                          (dom/thead
                           (dom/tr
-                           (dom/th "Company Name")
+                           (dom/th "Name")
                            (dom/th "SID")
+                           (dom/th "Industry")
                            (dom/th "")))
                          (dom/tbody
-                          (om/build-all company-info companies)))))
+                          (om/build-all company-table-line companies
+                                        {:init-state {:editing? false}})))))
 
 
 (defcomponent render-companies-index [_ _]

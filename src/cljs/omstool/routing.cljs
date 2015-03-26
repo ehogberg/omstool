@@ -7,17 +7,21 @@
   (:import goog.History
            goog.history.EventType))
 
+
 (defroute home-path "/" []
   (om/root render-homepage
            nil
            {:target (. js/document (getElementById "content"))}))
+
 
 (defroute company-index-path "/companies" []
   (om/root render-companies-index
            nil
            {:target (. js/document (getElementById "content"))}))
 
+
 (defn start-routing []
+  "Configures the app to have Secretary handle link clicks."
   (secretary/set-config! :prefix "#")
 
   (let [h (goog.History.)]
