@@ -19,23 +19,29 @@
   (reify
     om/IRender
     (render [_]
-      (n/navbar {:brand (dom/a {:href "#/"} "Admin")
-                 :inverse? true}
-                (n/nav {:collapsible? true}
-                  (om/build-all render-nav-item (:links nav)))))))
+      (g/row nil
+             (g/col {:md 12}
+                    (n/navbar {:brand (dom/a {:href "#/"} "Admin")
+                               :inverse? true}
+                              (n/nav {:collapsible? true}
+                                     (om/build-all render-nav-item (:links nav)))))))))
 
 
 (defn render-footer [_ _]
   (reify
     om/IRender
     (render [_]
-      (p/panel nil ""))))
+      (g/row nil
+             (g/col {:md 12}
+                    (p/panel nil ""))))))
 
 
 (defn render-homepage [_ _]
   (reify
     om/IRender
     (render [_]
-      (r/jumbotron {}
-                   (dom/p "Welcome to FRED Admin")))))
+      (g/row nil
+             (g/col {:md 12}
+                    (r/jumbotron {}
+                                 (dom/p "Welcome to FRED Admin")))))))
 
