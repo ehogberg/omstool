@@ -23,9 +23,25 @@
                     {:value "retail" :label "Retail"}])
 
 
-(defcomponent company-table-line [c owner]
+
+(defn persist-company-state [owner]
+  ;; Here would be validation...
+  ;; ...and then, remote persistence
+  ;; ...and if that worked, update local component state.
+  (om/update-state! owner
+     (fn [state]
+       (let [curr-company (:company state)
+             upd-company (assoc curr-company
+                            :name (input-value owner "name")
+                            :sid (input-value owner "sid"))]
+         (assoc state
+                :editing? false
+                :company upd-company)))))
+
+
+(defcomponent company-table-line [company owner]
   (init-state [_]
-              {:company c})
+              {:company company})
   (render-state [_ {:keys [company editing?]}]
                 (dom/tr
                  (dom/td
@@ -46,14 +62,9 @@
                  (dom/td (action-links owner editing?
                             (fn [e]
                               (case e
-                                "save" (fn []
-                                         (om/update-state! owner
-                                           (fn [state]
-                                             (assoc state
-                                                    :name (input-value owner "name")
-                                                    :editing? false))))
-                                "cancel" (om/set-state! owner :editing? false)
-                                "edit" (om/set-state! owner
+                                "save"  (persist-company-state owner)
+                                "cancel"(om/set-state! owner :editing? false)
+                                "edit"  (om/set-state! owner
                                                       :editing? true))))))))
 
 
