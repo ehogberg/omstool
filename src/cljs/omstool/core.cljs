@@ -7,7 +7,6 @@
                                          :label "Companies"}]}}))
 
 (defn main []
-  (.log js/console app-state)
   (om/root
     render-nav
     (get @app-state :nav)
@@ -18,4 +17,4 @@
    nil
    {:target (. js/document (getElementById "footer"))})
 
-  (secretary/dispatch! "/"))
+  (secretary/dispatch! (.-pathname (.-location js/window))))

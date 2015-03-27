@@ -2,11 +2,13 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.dom :as dom :include-macros true]
             [om-tools.core :refer-macros [defcomponent]]
+            [omstool.ui :refer [text-input-type
+                                select-input-type
+                                options-for-select
+                                action-links]]
             [om-bootstrap.table :as t]
-            [om-bootstrap.button :as b]
             [om-bootstrap.grid :as g]
-            [om-bootstrap.input :as i]
-            [om-bootstrap.random :as r]))
+            [om-bootstrap.input :as i]))
 
 
 (def company-data [ {:sid "Foo"
@@ -19,40 +21,6 @@
 (def industry-data [{:value "travel" :label "Travel"}
                     {:value "retail" :label "Retail"}])
 
-
-(defn input-value [owner input]
-  (-> (om/get-node owner input)
-      .->value))
-
-(defn action-links [owner editing?]
-  (if-not editing?
-    (b/button {:href "#"
-               :onClick (fn [e]
-                          (om/set-state! owner :editing? true)
-                          (.preventDefault e))} "edit")
-    (b/toolbar nil
-     (b/button {:href "#" :bs-style "primary"} "save")
-     (b/button {:href "#"
-                :onClick (fn [e]
-                           (om/set-state! owner :editing? false)
-                           (.preventDefault e))} "cancel"))))
-
-
-(defn text-input-type [editing?]
-  (if editing?
-    "text"
-    "static"))
-
-(defn select-input-type [editing?]
-  (if editing?
-    "select"
-    "static"))
-
-(defn options-for-select [data selected]
-  (map (fn [o] (dom/option {:value (:value o)
-                            :selected (= selected (:value o))}
-                           (:label o)))
-       data))
 
 (defcomponent company-table-line [company owner]
   (init-state [_]
@@ -74,7 +42,13 @@
                            (if editing? (options-for-select
                                          industry-data
                                          (:industry company)))))
-                 (dom/td (action-links owner editing?)))))
+                 (dom/td (action-links owner editing?
+                            (fn [e]
+                              (case e
+                                "save" (om/set-state! owner :editing? false)
+                                "cancel" (om/set-state! owner :editing? false)
+                                "edit" (om/set-state! owner
+                                                      :editing? true))))))))
 
 
 (defcomponent companies-table [_ _]
