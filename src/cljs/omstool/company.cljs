@@ -4,16 +4,21 @@
             [om-tools.core :refer-macros [defcomponent]]
             [om-bootstrap.table :as t]
             [om-bootstrap.button :as b]
+            [om-bootstrap.grid :as g]
             [om-bootstrap.input :as i]
             [om-bootstrap.random :as r]))
 
 
 (def company-data [ {:sid "Foo"
                      :name "Foo Company"
-                     :industry "Retail"}
+                     :industry "retail"}
                     {:sid "Bar"
                      :name "Bar Company"
-                     :industry "Travel"}])
+                     :industry "travel"}])
+
+(def industry-data [{:value "travel" :label "Travel"}
+                    {:value "retail" :label "Retail"}])
+
 
 (defn input-value [owner input]
   (-> (om/get-node owner input)
@@ -33,30 +38,53 @@
                            (.preventDefault e))} "cancel"))))
 
 
+(defn text-input-type [editing?]
+  (if editing?
+    "text"
+    "static"))
+
+(defn select-input-type [editing?]
+  (if editing?
+    "select"
+    "static"))
+
+(defn options-for-select [data selected]
+  (map (fn [o] (dom/option {:value (:value o)
+                            :selected (= selected (:value o))}
+                           (:label o)))
+       data))
+
 (defcomponent company-table-line [company owner]
   (init-state [_]
               {:company company})
   (render-state [_ {:keys [company editing?]}]
                 (dom/tr
                  (dom/td
-                  (if editing?
-                    (i/input {:type "text"
-                              :ref "company-name"
-                              :default-value (:name company)})
-                    (:name company)))
+                  (i/input {:type (text-input-type editing?)
+                            :ref "company-name"
+                            :value (:name company)}))
                  (dom/td
-                  (if editing?
-                    (i/input {:type "text"
-                              :ref "company-id"
-                              :default-value (:sid company)})
-                    (:sid  company)))
-                 (dom/td (:industry company))
+                  (i/input {:type (text-input-type editing?)
+                            :ref "company-id"
+                            :value (:sid company)}))
+                 (dom/td
+                  (i/input {:type (select-input-type editing?)
+                            :ref "industry-id"
+                            :value (:industry company)}
+                           (if editing? (options-for-select
+                                         industry-data
+                                         (:industry company)))))
                  (dom/td (action-links owner editing?)))))
 
 
 (defcomponent companies-table [_ _]
   (render-state [_ {:keys [companies]}]
                 (t/table {:striped? true}
+                         (dom/colgroup
+                          (dom/col {:className "col-md-4"} nil)
+                          (dom/col {:className "col-md-4"} nil)
+                          (dom/col {:className "col-md-2"} nil)
+                          (dom/col {:className "col-md-2"} nil))
                          (dom/thead
                           (dom/tr
                            (dom/th "Name")
@@ -70,10 +98,11 @@
 
 (defcomponent render-companies-index [_ _]
   (render [_]
-          (dom/div
-           (dom/h3 "Companies")
-           (om/build companies-table nil
-                     {:init-state {:companies company-data}}))))
+          (g/row nil
+                 (g/col {:md 12}
+                        (dom/h3 "Companies")
+                        (om/build companies-table nil
+                                  {:init-state {:companies company-data}})))))
 
 
 
