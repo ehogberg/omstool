@@ -11,10 +11,14 @@
 
 ;; Utility/helper fxns...
 
-(defn text-input-type [editing?]
+(defn text-input-attribs [id val editing?]
   (if editing?
-    "text"
-    "static"))
+    {:type "text"
+     :ref id
+     :default-value val}
+    {:type "static"
+     :ref id
+     :value val}))
 
 
 (defn select-input-type [editing?]
@@ -30,7 +34,7 @@
 
 
 (defn input-value [owner input]
-  (.->value (om/get-node owner input)))
+  (.-value (om/get-node owner input)))
 
 
 

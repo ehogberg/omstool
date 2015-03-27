@@ -2,9 +2,10 @@
   (:require [om.core :as om :include-macros true]
             [om-tools.dom :as dom :include-macros true]
             [om-tools.core :refer-macros [defcomponent]]
-            [omstool.ui :refer [text-input-type
+            [omstool.ui :refer [text-input-attribs
                                 select-input-type
                                 options-for-select
+                                input-value
                                 action-links]]
             [om-bootstrap.table :as t]
             [om-bootstrap.grid :as g]
@@ -22,19 +23,19 @@
                     {:value "retail" :label "Retail"}])
 
 
-(defcomponent company-table-line [company owner]
+(defcomponent company-table-line [c owner]
   (init-state [_]
-              {:company company})
+              {:company c})
   (render-state [_ {:keys [company editing?]}]
                 (dom/tr
                  (dom/td
-                  (i/input {:type (text-input-type editing?)
-                            :ref "company-name"
-                            :value (:name company)}))
+                  (i/input (text-input-attribs "name"
+                                            (:name company)
+                                            editing?)))
                  (dom/td
-                  (i/input {:type (text-input-type editing?)
-                            :ref "company-id"
-                            :value (:sid company)}))
+                  (i/input (text-input-attribs "sid"
+                                            (:sid company)
+                                            editing?)))
                  (dom/td
                   (i/input {:type (select-input-type editing?)
                             :ref "industry-id"
@@ -45,7 +46,12 @@
                  (dom/td (action-links owner editing?
                             (fn [e]
                               (case e
-                                "save" (om/set-state! owner :editing? false)
+                                "save" (fn []
+                                         (om/update-state! owner
+                                           (fn [state]
+                                             (assoc state
+                                                    :name (input-value owner "name")
+                                                    :editing? false))))
                                 "cancel" (om/set-state! owner :editing? false)
                                 "edit" (om/set-state! owner
                                                       :editing? true))))))))
