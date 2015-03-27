@@ -3,7 +3,7 @@
             [om-tools.dom :as dom :include-macros true]
             [om-tools.core :refer-macros [defcomponent]]
             [omstool.ui :refer [text-input-attribs
-                                select-input-type
+                                select-input-attribs
                                 options-for-select
                                 input-value
                                 action-links]]
@@ -17,10 +17,14 @@
                      :industry "retail"}
                     {:sid "Bar"
                      :name "Bar Company"
-                     :industry "travel"}])
+                     :industry "travel"}
+                    {:sid "Baz"
+                     :name "Baz Company"
+                     :industry "retail"}])
 
 (def industry-data [{:value "travel" :label "Travel"}
                     {:value "retail" :label "Retail"}])
+
 
 
 
@@ -33,7 +37,8 @@
        (let [curr-company (:company state)
              upd-company (assoc curr-company
                             :name (input-value owner "name")
-                            :sid (input-value owner "sid"))]
+                            :sid (input-value owner "sid")
+                            :industry (input-value owner "industry-id"))]
          (assoc state
                 :editing? false
                 :company upd-company)))))
@@ -53,9 +58,9 @@
                                             (:sid company)
                                             editing?)))
                  (dom/td
-                  (i/input {:type (select-input-type editing?)
-                            :ref "industry-id"
-                            :value (:industry company)}
+                  (i/input (select-input-attribs "industry-id"
+                                                 (:industry company)
+                                                 editing?)
                            (if editing? (options-for-select
                                          industry-data
                                          (:industry company)))))
@@ -66,7 +71,6 @@
                                 "cancel"(om/set-state! owner :editing? false)
                                 "edit"  (om/set-state! owner
                                                       :editing? true))))))))
-
 
 (defcomponent companies-table [_ _]
   (render-state [_ {:keys [companies]}]

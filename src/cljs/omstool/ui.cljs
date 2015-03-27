@@ -10,7 +10,6 @@
 
 
 ;; Utility/helper fxns...
-
 (defn text-input-attribs [id val editing?]
   (if editing?
     {:type "text"
@@ -20,11 +19,14 @@
      :ref id
      :value val}))
 
-
-(defn select-input-type [editing?]
+(defn select-input-attribs [id val editing?]
   (if editing?
-    "select"
-    "static"))
+      {:type "select"
+       :ref id
+       :default-value val}
+      {:type "static"
+       :ref id
+       :value val}))
 
 
 (defn options-for-select [data selected]
@@ -91,7 +93,7 @@
     om/IRender
     (render [_]
       (g/row nil
-             (g/col {:md 12}
-                    (r/jumbotron {}
-                                 (dom/p "Welcome to FRED Admin")))))))
-
+         (g/col {:md 12}
+            (r/jumbotron {}
+               (dom/p "Welcome to FRED Admin")))))))
+ 
